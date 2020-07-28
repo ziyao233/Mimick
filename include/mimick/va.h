@@ -32,7 +32,8 @@
 # undef mmk_va_args
 
 # define mmk_make_va_param(vd, vl, type) do {                               \
-        (vd) = mmk_malloc(sizeof (struct mmk_va_param) + sizeof (type));    \
+        (vd) = (struct mmk_va_param *)mmk_malloc(                           \
+            sizeof (struct mmk_va_param) + sizeof (type));                  \
         (vd)->size = sizeof (type);                                         \
         type val = va_arg(vl, type);                                        \
         mmk_memcpy((vd)->data, &val, sizeof (type));                        \

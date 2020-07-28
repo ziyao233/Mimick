@@ -26,6 +26,12 @@
 
 # include <stddef.h>
 
+# include "literal.h"
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 struct mmk_verify_params {
     int sentinel_;
     int never;
@@ -39,15 +45,20 @@ void mmk_verify_set_times(size_t times);
 int mmk_verify_times(struct mmk_verify_params *params);
 void mmk_verify_register_call(void *params, size_t size);
 
+# ifdef __cplusplus
+}
+# endif
+
 # undef mmk_verify
 # define mmk_verify(CallExpr, ...) \
         (mmk_matcher_init(1), \
         (void) (CallExpr), \
         mmk_matcher_term(), \
         mmk_mock_reset_call(__FILE__, __LINE__), \
-        mmk_verify_times(&(struct mmk_verify_params) { \
-            __VA_ARGS__, \
-            .sentinel_=1, \
-        }))
+        mmk_verify_times(&mmk_struct_literal( \
+          struct mmk_verify_params, \
+          __VA_ARGS__, \
+          .sentinel_=1, \
+        )))
 
 #endif /* !MMK_VERIFY_H_ */

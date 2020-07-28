@@ -26,19 +26,24 @@
 
 # include <stddef.h>
 # include "mimick/preprocess.h"
+# include "mimick/literal.h"
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 struct mmk_va_param {
     size_t size;
-    char data[];
+    char data[1];
 };
 
 typedef void(*mmk_fn)(void);
-typedef struct mmk_stub *mmk_stub;
+struct mmk_stub;
 
 /**
  * An invalid stub. Used for error checking if creating a stub fails.
  */
-# define MMK_STUB_INVALID ((mmk_stub)0)
+# define MMK_STUB_INVALID ((struct mmk_stub *)0)
 
 /**
  * An invalid mock. Used for error checking if creating a mock fails.
@@ -59,7 +64,7 @@ typedef struct mmk_stub *mmk_stub;
  *
  * @returns The current stub object.
  */
-mmk_stub mmk_ctx(void);
+struct mmk_stub *mmk_ctx(void);
 
 /**
  * Get the user context from a stub object.
@@ -73,7 +78,7 @@ mmk_stub mmk_ctx(void);
  *
  * @returns The user context or NULL
  */
-void *mmk_stub_context(mmk_stub stub);
+void *mmk_stub_context(struct mmk_stub *stub);
 
 /**
  * Creates a stub object and hijacks calls to the function targeted by
@@ -95,7 +100,7 @@ void *mmk_stub_context(mmk_stub stub);
  *
  * @returns The created stub object or MMK_STUB_INVALID.
  */
-mmk_stub mmk_stub_create(const char *target, mmk_fn fn, void *ctx);
+struct mmk_stub *mmk_stub_create(const char *target, mmk_fn fn, void *ctx);
 
 /**
  * Destroy a stub object and restores the original function it targets.
@@ -108,9 +113,13 @@ mmk_stub mmk_stub_create(const char *target, mmk_fn fn, void *ctx);
  *
  * @param[in] stub  The stub object to destroy.
  */
-void mmk_stub_destroy(mmk_stub stub);
+void mmk_stub_destroy(struct mmk_stub *stub);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 /* Mock API */
 
@@ -122,7 +131,7 @@ void mmk_stub_destroy(mmk_stub stub);
 /**
  * Convenience wrapper to get an addressable temporary object from a lvalue.
  */
-# define mmk_val(Type, ...) (&(Type) { __VA_ARGS__ })
+# define mmk_val(Type, ...) &(mmk_literal(Type, {(__VA_ARGS__)}))
 
 /**
  * Defines a mock blueprint and typedef the Id to a function pointer type
