@@ -6,6 +6,11 @@ cmake_minimum_required (VERSION 2.8)
 
 project (Mimick C)
 
+if(POLICY CMP0042)
+  # Allow @rpath in target's install name
+  cmake_policy(SET CMP0042 NEW)
+endif()
+
 include (CheckSymbolExists)
 include (GNUInstallDirs)
 
@@ -157,6 +162,7 @@ include_directories(include src "${PROJECT_BINARY_DIR}/src")
 add_subdirectory (src)
 
 add_library (mimick STATIC ${SOURCE_FILES})
+target_include_directories(mimick INTERFACE $<INSTALL_INTERFACE:include>)
 
 foreach (F ${INTERFACE_FILES})
   get_filename_component(DEST "${F}" PATH)
@@ -164,6 +170,7 @@ foreach (F ${INTERFACE_FILES})
 endforeach ()
 
 install(TARGETS mimick
+  EXPORT mimick-targets
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -196,3 +203,11 @@ endfunction ()
 enable_testing ()
 add_subdirectory (test)
 add_subdirectory (sample)
+
+install(EXPORT mimick-targets DESTINATION lib/cmake/mimick)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+	"mimickConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mimickConfig.cmake"
+	INSTALL_DESTINATION "lib/cmake/mimick"
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mimickConfig.cmake" DESTINATION "lib/cmake/mimick")
