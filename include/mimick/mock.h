@@ -90,6 +90,7 @@ void mmk_reset(mmk_fn fn);
 
 # define MMK_MK_ARG_STR(_, X) #X,
 
+// cppcheck-suppress preprocessorErrorDirective
 # define MMK_MANGLE_(Id, Name) mmkuser_ ## Id ## _ ## Name
 # define MMK_MANGLE(Id, Name) MMK_MANGLE_(Id, Name)
 
