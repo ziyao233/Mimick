@@ -80,7 +80,7 @@ inline T (& mmk_assign(T (&dst)[N], T * src))[N] {
   return dst;
 }
 
-inline va_list & mmk_assign(va_list & dst, va_list src) {
+inline va_list & mmk_assign(va_list & dst, va_list) {
   // no-op
   return dst;
 }
