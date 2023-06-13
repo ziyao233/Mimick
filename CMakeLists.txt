@@ -37,7 +37,10 @@ endif()
 set (MMK_MANGLING "none")
 
 if (MSVC)
-  if (NOT _ARCH)
+  # Visual Studio generator version earlier than 2017 (included) default to x86,
+  # after 2019 (included) it defaults to amd64
+  # MSVC_VERSION = 1920 corresponds to Visual Studio 2019
+  if (NOT CMAKE_GENERATOR_PLATFORM AND MSVC_VERSION LESS 1920)
     set (_ARCH "x86")
   endif ()
 
